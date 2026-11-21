@@ -13,7 +13,7 @@ def translate_text(text, target_lang):
     except Exception:
         return text
 
-# --- SIDEBAR: GOOGLE TRANSLATE & SETTINGS ---
+# --- LANGUAGES LIST ---
 LANGUAGES = {
     "Original (Default)": "original",
     "Hindi (हिंदी)": "hi",
@@ -25,29 +25,23 @@ LANGUAGES = {
     "Tamil (தமிழ்)": "ta"
 }
 
-with st.sidebar:
-    st.header("🌐 App Language")
-    selected_lang_name = st.selectbox("Real-Time Translate:", list(LANGUAGES.keys()))
-    lang_code = LANGUAGES[selected_lang_name]
-    
-    if st.button("🔄 Refresh Translation"):
-        st.cache_data.clear()
-        st.rerun()
-        
-    st.divider()
-    st.caption("💡 Tip: Agar kisi language mein translation slow ho, toh browser mein Right-Click karke 'Translate' bhi use kar sakte hain.")
+# --- MAIN CONTROL BAR: BOOK FILTER + GOOGLE TRANSLATE EK SAATH ---
+with st.container(border=True):
+    col1, col2 = st.columns([2, 1])
+    with col2:
+        selected_lang_name = st.selectbox("🌐 Page Language (Google Translate):", list(LANGUAGES.keys()))
+        lang_code = LANGUAGES[selected_lang_name]
+    with col1:
+        lang_filter = st.radio(
+            translate_text("📚 Book Language Filter Chunein:", lang_code),
+            ["All", "Hindi", "English", "Roman / Hinglish"],
+            horizontal=True
+        )
 
 # --- MAIN HEADER ---
 with st.spinner("Translating..."):
     st.title(f"📚 {translate_text('Free Trading & Investing Library', lang_code)}")
     st.caption(translate_text("100% Genuine, Legal & Free Study Material (Hindi | English | Roman/Hinglish)", lang_code))
-
-    # Main Screen: Book Language Filter
-    lang_filter = st.radio(
-        translate_text("Book Language Filter Chunein:", lang_code),
-        ["All", "Hindi", "English", "Roman / Hinglish"],
-        horizontal=True
-    )
 
 # --- 100% GENUINE RESOURCES DATA ---
 RESOURCES = {
@@ -200,7 +194,7 @@ RESOURCES = {
                 "author": "Investopedia (Trusted Education)",
                 "lang": "English",
                 "desc": "Forex market basics, currency pairs aur global macro economics ki genuine guide.",
-                "url": "https://www.investopedia.com/forex-4427703"
+                "url": "https://www.investopedia.com/articles/forex/11/why-trade-forex.asp"
             }
         ]
     }
