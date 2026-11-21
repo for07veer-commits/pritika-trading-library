@@ -3,8 +3,8 @@ from deep_translator import GoogleTranslator
 
 st.set_page_config(page_title="Free Trading Library", page_icon="📚", layout="wide")
 
-# --- GOOGLE TRANSLATE FUNCTION (Cached for fast speed) ---
-@st.cache_data
+# --- REAL-TIME GOOGLE TRANSLATE FUNCTION ---
+@st.cache_data(show_spinner=False)
 def translate_text(text, target_lang):
     if target_lang == "original" or not text:
         return text
@@ -13,7 +13,7 @@ def translate_text(text, target_lang):
     except Exception:
         return text
 
-# Top Language Bar (Google Translate)
+# --- SIDEBAR: GOOGLE TRANSLATE & SETTINGS ---
 LANGUAGES = {
     "Original (Default)": "original",
     "Hindi (हिंदी)": "hi",
@@ -25,23 +25,31 @@ LANGUAGES = {
     "Tamil (தமிழ்)": "ta"
 }
 
-col_title, col_lang = st.columns([3, 1])
-with col_lang:
-    selected_lang_name = st.selectbox("🌐 Google Translate:", list(LANGUAGES.keys()))
+with st.sidebar:
+    st.header("🌐 App Language")
+    selected_lang_name = st.selectbox("Real-Time Translate:", list(LANGUAGES.keys()))
     lang_code = LANGUAGES[selected_lang_name]
+    
+    if st.button("🔄 Refresh Translation"):
+        st.cache_data.clear()
+        st.rerun()
+        
+    st.divider()
+    st.caption("💡 Tip: Agar kisi language mein translation slow ho, toh browser mein Right-Click karke 'Translate' bhi use kar sakte hain.")
 
-with col_title:
+# --- MAIN HEADER ---
+with st.spinner("Translating..."):
     st.title(f"📚 {translate_text('Free Trading & Investing Library', lang_code)}")
-    st.caption(translate_text("Legal, Free & Valuable Study Material (Hindi | English | Roman/Hinglish)", lang_code))
+    st.caption(translate_text("100% Genuine, Legal & Free Study Material (Hindi | English | Roman/Hinglish)", lang_code))
 
-# Resource Language Filter
-lang_filter = st.radio(
-    translate_text("Book Language Filter Chunein:", lang_code),
-    ["All", "Hindi", "English", "Roman / Hinglish"],
-    horizontal=True
-)
+    # Main Screen: Book Language Filter
+    lang_filter = st.radio(
+        translate_text("Book Language Filter Chunein:", lang_code),
+        ["All", "Hindi", "English", "Roman / Hinglish"],
+        horizontal=True
+    )
 
-# --- RESOURCES DATA ---
+# --- 100% GENUINE RESOURCES DATA ---
 RESOURCES = {
     "Indian": {
         "Stock Investing": [
@@ -65,6 +73,13 @@ RESOURCES = {
                 "lang": "Hindi",
                 "desc": "Share market ke basic rules aur investor safety par official free Hindi/English booklets.",
                 "url": "https://investor.sebi.gov.in/"
+            },
+            {
+                "title": "NISM - Free Investor Education Material",
+                "author": "NISM (SEBI Initiative)",
+                "lang": "English",
+                "desc": "National Institute of Securities Markets ka official free learning material.",
+                "url": "https://www.nism.ac.in/"
             }
         ],
         "Intraday": [
@@ -181,11 +196,11 @@ RESOURCES = {
                 "url": "https://www.babypips.com/learn/forex"
             },
             {
-                "title": "IFC Markets - Free Forex eBooks (Hindi & English)",
-                "author": "IFC Markets",
-                "lang": "Hindi",
-                "desc": "Beginners ke liye muft Forex trading PDF eBooks aur tutorials.",
-                "url": "https://www.ifcmarkets.com/en/forex-books"
+                "title": "Investopedia - Forex Trading Guide",
+                "author": "Investopedia (Trusted Education)",
+                "lang": "English",
+                "desc": "Forex market basics, currency pairs aur global macro economics ki genuine guide.",
+                "url": "https://www.investopedia.com/forex-4427703"
             }
         ]
     }
