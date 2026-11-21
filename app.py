@@ -1,18 +1,47 @@
 import streamlit as st
+from deep_translator import GoogleTranslator
 
 st.set_page_config(page_title="Free Trading Library", page_icon="📚", layout="wide")
 
-st.title("📚 Free Trading & Investing Library")
-st.caption("Legal, Free & Valuable Study Material (Hindi | English | Roman/Hinglish)")
+# --- GOOGLE TRANSLATE FUNCTION (Cached for fast speed) ---
+@st.cache_data
+def translate_text(text, target_lang):
+    if target_lang == "original" or not text:
+        return text
+    try:
+        return GoogleTranslator(source="auto", target=target_lang).translate(text)
+    except Exception:
+        return text
 
-# Language Filter
+# Top Language Bar (Google Translate)
+LANGUAGES = {
+    "Original (Default)": "original",
+    "Hindi (हिंदी)": "hi",
+    "English": "en",
+    "Punjabi (ਪੰਜਾਬੀ)": "pa",
+    "Gujarati (ગુજરાતી)": "gu",
+    "Marathi (मराठी)": "mr",
+    "Bengali (বাংলা)": "bn",
+    "Tamil (தமிழ்)": "ta"
+}
+
+col_title, col_lang = st.columns([3, 1])
+with col_lang:
+    selected_lang_name = st.selectbox("🌐 Google Translate:", list(LANGUAGES.keys()))
+    lang_code = LANGUAGES[selected_lang_name]
+
+with col_title:
+    st.title(f"📚 {translate_text('Free Trading & Investing Library', lang_code)}")
+    st.caption(translate_text("Legal, Free & Valuable Study Material (Hindi | English | Roman/Hinglish)", lang_code))
+
+# Resource Language Filter
 lang_filter = st.radio(
-    "Language Filter Chunein:",
+    translate_text("Book Language Filter Chunein:", lang_code),
     ["All", "Hindi", "English", "Roman / Hinglish"],
     horizontal=True
 )
 
-# --- YAHAN NAYE LINKS ADD YA UPDATE KAREIN ---
+# --- RESOURCES DATA ---
 RESOURCES = {
     "Indian": {
         "Stock Investing": [
@@ -94,7 +123,7 @@ RESOURCES = {
                 "author": "Benjamin Graham",
                 "lang": "Roman / Hinglish",
                 "desc": "Value investing ki sabse mashhoor kitab ka free Hindi/Hinglish summary.",
-                "url": "https://www.youtube.com/results?search_query=The+Intelligent+Investor+Hindi+Audiobook+Summary"
+                "url": "https://www.youtube.com/results?search_query=The+Intelligent+Investor+audiobook+hindi"
             },
             {
                 "title": "Extraordinary Popular Delusions (Free Public Domain Book)",
@@ -124,7 +153,7 @@ RESOURCES = {
                 "author": "Mark Douglas",
                 "lang": "Roman / Hinglish",
                 "desc": "Trading discipline, FOMO aur fear par kaabu paane ke liye best psychology book.",
-                "url": "https://www.youtube.com/results?search_query=Trading+in+the+Zone+Mark+Douglas+Hindi+Summary"
+                "url": "https://www.youtube.com/results?search_query=Trading+in+the+Zone+Mark+Douglas+audiobook+hindi"
             },
             {
                 "title": "Japanese Candlestick Charting Techniques (Hindi Summary)",
@@ -140,7 +169,7 @@ RESOURCES = {
                 "author": "Sheldon Natenberg",
                 "lang": "Roman / Hinglish",
                 "desc": "Professional options pricing aur implied volatility (IV) par top foreign book summary.",
-                "url": "https://www.youtube.com/results?search_query=Option+Volatility+and+Pricing+Sheldon+Natenberg+Summary"
+                "url": "https://www.youtube.com/results?search_query=Option+Volatility+and+Pricing+Sheldon+Natenberg+hindi"
             }
         ],
         "Forex": [
@@ -169,18 +198,22 @@ def display_section(author_type):
         if lang_filter != "All":
             items = [item for item in items if item["lang"] == lang_filter]
         
-        with st.expander(f"📂 {cat} ({len(items)} Resources)", expanded=True):
+        cat_label = translate_text(cat, lang_code)
+        with st.expander(f"📂 {cat_label} ({len(items)})", expanded=True):
             if not items:
-                st.info(f"Is category mein '{lang_filter}' language ka koi resource abhi add nahi hai.")
+                st.info(translate_text(f"Is category mein '{lang_filter}' language ka koi resource abhi add nahi hai.", lang_code))
             else:
                 for item in items:
-                    st.markdown(f"**📖 {item['title']}**")
+                    st.markdown(f"**📖 {translate_text(item['title'], lang_code)}**")
                     st.markdown(f"*Author:* {item['author']} | *Language:* `{item['lang']}`")
-                    st.write(item['desc'])
-                    st.link_button("🔗 Open Free Resource", item['url'])
+                    st.write(translate_text(item['desc'], lang_code))
+                    st.link_button(f"🔗 {translate_text('Open Free Resource', lang_code)}", item['url'])
                     st.divider()
 
-tab1, tab2 = st.tabs(["🇮🇳 Indian Authors & Platforms", "🌍 Foreign Authors & Classics"])
+tab1, tab2 = st.tabs([
+    f"🇮🇳 {translate_text('Indian Authors & Platforms', lang_code)}",
+    f"🌍 {translate_text('Foreign Authors & Classics', lang_code)}"
+])
 
 with tab1:
     display_section("Indian")
@@ -188,7 +221,8 @@ with tab1:
 with tab2:
     display_section("Foreign")
 
-st.warning(
-    "⚠️ **Educational Disclaimer:** Ye saare links sirf learning aur educational purpose ke liye hain. "
+disclaimer_text = (
+    "Educational Disclaimer: Ye saare links sirf learning aur educational purpose ke liye hain. "
     "Bharat mein bina RBI/SEBI ki anumati ke unauthorized foreign forex platforms par trade karna legal nahi hai."
 )
+st.warning(f"⚠️ {translate_text(disclaimer_text, lang_code)}")
